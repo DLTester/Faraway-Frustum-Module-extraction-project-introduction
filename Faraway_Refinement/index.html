@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Faraway 细化阶段 (Faraway Refinement) - Faraway-Frustum 融合算子文档</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../css/overrides.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Faraway \u7ec6\u5316\u9636\u6bb5 (Faraway Refinement)";
+        var mkdocs_page_input_path = "Faraway_Refinement.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Faraway-Frustum 融合算子文档
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">文档首页</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Frustum_Construction/">Frustum 构建阶段 (Frustum Construction)</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Faraway 细化阶段 (Faraway Refinement)</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#api">API 文档</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#frustum_axis_alignment">frustum_axis_alignment</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Faraway_Refinement.operator.frustum_axis_alignment">frustum_axis_alignment</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Faraway_Refinement.operator.frustum_axis_alignment.frustum_axis_alignment">frustum_axis_alignment</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#centroid_coordinate_transform">centroid_coordinate_transform</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Faraway_Refinement.operator.centroid_coordinate_transform">centroid_coordinate_transform</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Faraway_Refinement.operator.centroid_coordinate_transform.centroid_coordinate_transform">centroid_coordinate_transform</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#frustum_bev_projection">frustum_bev_projection</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Faraway_Refinement.operator.frustum_bev_projection">frustum_bev_projection</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Faraway_Refinement.operator.frustum_bev_projection.frustum_bev_projection">frustum_bev_projection</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#farawayfrustumboxregression">FarawayFrustumBoxRegression</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Faraway_Refinement.network.FarawayFrustumBoxRegression">FarawayFrustumBoxRegression</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Faraway_Refinement.network.FarawayFrustumBoxRegression.FarawayFrustumBoxRegression">FarawayFrustumBoxRegression</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#Faraway_Refinement.network.FarawayFrustumBoxRegression.FarawayFrustumBoxRegression--_1">结构说明（按顺序）</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#Faraway_Refinement.network.FarawayFrustumBoxRegression.FarawayFrustumBoxRegression--_2">输入</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#Faraway_Refinement.network.FarawayFrustumBoxRegression.FarawayFrustumBoxRegression--_1">输出</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#Faraway_Refinement.network.FarawayFrustumBoxRegression.FarawayFrustumBoxRegression--_1">模块用途</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#assemble_faraway_3d_box">assemble_faraway_3d_box</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Faraway_Refinement.operator.assemble_faraway_3d_box">assemble_faraway_3d_box</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Faraway_Refinement.operator.assemble_faraway_3d_box.assemble_faraway_3d_box">assemble_faraway_3d_box</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#Faraway_Refinement.operator.assemble_faraway_3d_box.assemble_faraway_3d_box--_1">输入</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#Faraway_Refinement.operator.assemble_faraway_3d_box.assemble_faraway_3d_box--_1">输出</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#Faraway_Refinement.operator.assemble_faraway_3d_box.assemble_faraway_3d_box--_1">算子用途</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../framework/">Faraway-Frustum 框架结构</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Faraway-Frustum 融合算子文档</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Faraway 细化阶段 (Faraway Refinement)</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="stage-2-faraway-refinementfaraway">Stage 2 – Faraway Refinement（Faraway 细化阶段）<a class="headerlink" href="#stage-2-faraway-refinementfaraway" title="Permanent link">&para;</a></h1>
+<p>💡<br />
+本阶段的作用是 <strong>对远距离目标进行几何对齐、局部坐标归一化与 BEV 表示构建，并通过可学习网络回归最终 3D 框参数</strong>，
+从而提升远距离目标的定位精度。</p>
+<p>本阶段包含五个算子：</p>
+<ol>
+<li>
+<p><strong>frustum_axis_alignment</strong><br />
+   对 Frustum 点云进行坐标旋转，使其与目标主方向对齐。</p>
+</li>
+<li>
+<p><strong>centroid_coordinate_transform</strong><br />
+   将点云转换到以质心为原点的局部坐标系。</p>
+</li>
+<li>
+<p><strong>frustum_bev_projection</strong><br />
+   将局部点云投影为 BEV 表示，用于后续网络回归。</p>
+</li>
+<li>
+<p><strong>FarawayFrustumBoxRegression</strong><br />
+   基于 BEV 特征进行 3D Box 参数回归的可学习网络（FF-Net）。</p>
+</li>
+<li>
+<p><strong>assemble_faraway_3d_box</strong><br />
+   根据质心与回归结果组装最终的 3D 检测框。</p>
+</li>
+</ol>
+<hr />
+<h2 id="api">API 文档<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
+<h3 id="frustum_axis_alignment">frustum_axis_alignment<a class="headerlink" href="#frustum_axis_alignment" title="Permanent link">&para;</a></h3>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="Faraway_Refinement.operator.frustum_axis_alignment"></a>
+    <div class="doc doc-contents first">
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="Faraway_Refinement.operator.frustum_axis_alignment.frustum_axis_alignment" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">frustum_axis_alignment</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">frustum_angles</span><span class="p">)</span></code>
+
+<a href="#Faraway_Refinement.operator.frustum_axis_alignment.frustum_axis_alignment" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Frustum 坐标轴对齐算子。</p>
+<p>该算子将每个 Frustum 点云根据其对应的视锥方向角进行旋转，
+统一对齐到标准坐标系方向，从而消除相机视角带来的方向差异，
+为后续质心平移与 BEV 投影提供稳定输入。</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>frustum_clusters</code></b>
+              –
+              <div class="doc-md-description">
+                <p>List[(Ni, 3)]
+每个实例对应的 Frustum 点云集合，
+Ni 为该实例内的点数。</p>
+              </div>
+            </li>
+            <li>
+              <b><code>frustum_angles</code></b>
+                  (<code><span title="torch.Tensor">Tensor</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>(K,)
+每个实例对应的 Frustum 朝向角（绕 Y 轴旋转角度，单位：弧度）。</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+<b><code>aligned_clusters</code></b>(                  <code><span title="torch.Tensor">Tensor</span></code>
+)              –
+              <div class="doc-md-description">
+                <p>List[(Ni, 3)]
+旋转对齐后的 Frustum 点云集合。</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+            <details class="quote">
+              <summary>Source code in <code>Faraway_Refinement\operator\frustum_axis_alignment.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@torch</span><span class="o">.</span><span class="n">library</span><span class="o">.</span><span class="n">custom_op</span><span class="p">(</span><span class="s2">&quot;faraway::frustum_axis_alignment&quot;</span><span class="p">,</span> <span class="n">mutates_args</span><span class="o">=</span><span class="p">[])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">frustum_axis_alignment</span><span class="p">(</span>
+    <span class="n">clusters</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>        <span class="c1"># (K, P, 3)</span>
+    <span class="n">counts</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>          <span class="c1"># (K,)</span>
+    <span class="n">frustum_angles</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>  <span class="c1"># (K,)</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Frustum 坐标轴对齐算子。</span>
+
+<span class="sd">    该算子将每个 Frustum 点云根据其对应的视锥方向角进行旋转，</span>
+<span class="sd">    统一对齐到标准坐标系方向，从而消除相机视角带来的方向差异，</span>
+<span class="sd">    为后续质心平移与 BEV 投影提供稳定输入。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        frustum_clusters: List[(Ni, 3)]</span>
+<span class="sd">            每个实例对应的 Frustum 点云集合，</span>
+<span class="sd">            Ni 为该实例内的点数。</span>
+
+<span class="sd">        frustum_angles: (K,)</span>
+<span class="sd">            每个实例对应的 Frustum 朝向角（绕 Y 轴旋转角度，单位：弧度）。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        aligned_clusters: List[(Ni, 3)]</span>
+<span class="sd">            旋转对齐后的 Frustum 点云集合。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">clusters</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">aligned</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
+
+    <span class="n">K</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clusters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">frustum_angles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+
+        <span class="n">rot</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span> <span class="n">c</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">),</span> <span class="n">s</span><span class="p">]),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)]),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="o">-</span><span class="n">s</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">),</span> <span class="n">c</span><span class="p">]),</span>
+        <span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">clusters</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>  <span class="c1"># (3,3)</span>
+
+        <span class="n">pts</span> <span class="o">=</span> <span class="n">clusters</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="p">:]</span>  <span class="c1"># (n,3)</span>
+        <span class="n">aligned</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">pts</span> <span class="o">@</span> <span class="n">rot</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">return</span> <span class="n">aligned</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><hr />
+<h3 id="centroid_coordinate_transform">centroid_coordinate_transform<a class="headerlink" href="#centroid_coordinate_transform" title="Permanent link">&para;</a></h3>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="Faraway_Refinement.operator.centroid_coordinate_transform"></a>
+    <div class="doc doc-contents first">
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="Faraway_Refinement.operator.centroid_coordinate_transform.centroid_coordinate_transform" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">centroid_coordinate_transform</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">centroids</span><span class="p">)</span></code>
+
+<a href="#Faraway_Refinement.operator.centroid_coordinate_transform.centroid_coordinate_transform" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>质心坐标归一化算子。</p>
+<p>该算子将每个 Frustum 点云平移到以目标质心为原点的局部坐标系，
+即对点云中的每个点减去对应实例的质心坐标。
+通过该变换，将全局定位问题转换为局部结构建模问题，
+有利于后续 BEV 投影与轻量网络回归。</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>aligned_clusters</code></b>
+              –
+              <div class="doc-md-description">
+                <p>List[(Ni, 3)]
+经过方向对齐后的 Frustum 点云集合，
+Ni 为该实例内的点数。</p>
+              </div>
+            </li>
+            <li>
+              <b><code>centroids</code></b>
+                  (<code><span title="torch.Tensor">Tensor</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>(K, 3)
+每个实例的三维质心坐标 (x, y, z)。</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+<b><code>local_clusters</code></b>(                  <code><span title="torch.Tensor">Tensor</span></code>
+)              –
+              <div class="doc-md-description">
+                <p>List[(Ni, 3)]
+以质心为原点的局部坐标点云集合。</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+            <details class="quote">
+              <summary>Source code in <code>Faraway_Refinement\operator\centroid_coordinate_transform.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@torch</span><span class="o">.</span><span class="n">library</span><span class="o">.</span><span class="n">custom_op</span><span class="p">(</span><span class="s2">&quot;faraway::centroid_coordinate_transform&quot;</span><span class="p">,</span> <span class="n">mutates_args</span><span class="o">=</span><span class="p">[])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">centroid_coordinate_transform</span><span class="p">(</span>
+    <span class="n">clusters</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>    <span class="c1"># (K, P, 3)</span>
+    <span class="n">counts</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>      <span class="c1"># (K,)</span>
+    <span class="n">centroids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>   <span class="c1"># (K, 3)</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    质心坐标归一化算子。</span>
+
+<span class="sd">    该算子将每个 Frustum 点云平移到以目标质心为原点的局部坐标系，</span>
+<span class="sd">    即对点云中的每个点减去对应实例的质心坐标。</span>
+<span class="sd">    通过该变换，将全局定位问题转换为局部结构建模问题，</span>
+<span class="sd">    有利于后续 BEV 投影与轻量网络回归。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        aligned_clusters: List[(Ni, 3)]</span>
+<span class="sd">            经过方向对齐后的 Frustum 点云集合，</span>
+<span class="sd">            Ni 为该实例内的点数。</span>
+
+<span class="sd">        centroids: (K, 3)</span>
+<span class="sd">            每个实例的三维质心坐标 (x, y, z)。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        local_clusters: List[(Ni, 3)]</span>
+<span class="sd">            以质心为原点的局部坐标点云集合。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">local</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clusters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">local</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">clusters</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">centroids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">local</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><hr />
+<h3 id="frustum_bev_projection">frustum_bev_projection<a class="headerlink" href="#frustum_bev_projection" title="Permanent link">&para;</a></h3>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="Faraway_Refinement.operator.frustum_bev_projection"></a>
+    <div class="doc doc-contents first">
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="Faraway_Refinement.operator.frustum_bev_projection.frustum_bev_projection" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">frustum_bev_projection</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">bev_height</span><span class="p">,</span> <span class="n">bev_width</span><span class="p">,</span> <span class="n">x_range</span><span class="p">,</span> <span class="n">z_range</span><span class="p">)</span></code>
+
+<a href="#Faraway_Refinement.operator.frustum_bev_projection.frustum_bev_projection" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Frustum 点云 BEV 投影算子。</p>
+<p>该算子将每个实例在局部坐标系下的三维点云
+投影到 Bird's Eye View (BEV) 平面，
+生成固定尺寸的二维栅格表示，用于后续轻量回归网络输入。</p>
+<p>投影方式：
+    - 使用 (x, z) 平面构建 BEV
+    - 统计每个栅格中的点数作为强度值</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>local_clusters</code></b>
+              –
+              <div class="doc-md-description">
+                <p>List[(Ni, 3)]
+以质心为原点的局部点云集合。</p>
+              </div>
+            </li>
+            <li>
+              <b><code>bev_height</code></b>
+                  (<code>int</code>)
+              –
+              <div class="doc-md-description">
+                <p>int
+BEV 栅格高度。</p>
+              </div>
+            </li>
+            <li>
+              <b><code>bev_width</code></b>
+                  (<code>int</code>)
+              –
+              <div class="doc-md-description">
+                <p>int
+BEV 栅格宽度。</p>
+              </div>
+            </li>
+            <li>
+              <b><code>x_range</code></b>
+                  (<code>float</code>)
+              –
+              <div class="doc-md-description">
+                <p>float
+BEV 在 x 方向的最大覆盖范围（[-x_range, x_range]）。</p>
+              </div>
+            </li>
+            <li>
+              <b><code>z_range</code></b>
+                  (<code>float</code>)
+              –
+              <div class="doc-md-description">
+                <p>float
+BEV 在 z 方向的最大覆盖范围（[-z_range, z_range]）。</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+<b><code>bev_maps</code></b>(                  <code><span title="torch.Tensor">Tensor</span></code>
+)              –
+              <div class="doc-md-description">
+                <p>(K, 1, H, W)
+每个实例对应的 BEV 投影结果，
+单通道表示点数密度。</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+            <details class="quote">
+              <summary>Source code in <code>Faraway_Refinement\operator\frustum_bev_projection.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@torch</span><span class="o">.</span><span class="n">library</span><span class="o">.</span><span class="n">custom_op</span><span class="p">(</span><span class="s2">&quot;faraway::frustum_bev_projection&quot;</span><span class="p">,</span> <span class="n">mutates_args</span><span class="o">=</span><span class="p">[])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">frustum_bev_projection</span><span class="p">(</span>
+    <span class="n">clusters</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>  <span class="c1"># (K, P, 3)</span>
+    <span class="n">counts</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>    <span class="c1"># (K,)</span>
+    <span class="n">bev_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">bev_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">x_range</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">z_range</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Frustum 点云 BEV 投影算子。</span>
+
+<span class="sd">    该算子将每个实例在局部坐标系下的三维点云</span>
+<span class="sd">    投影到 Bird&#39;s Eye View (BEV) 平面，</span>
+<span class="sd">    生成固定尺寸的二维栅格表示，用于后续轻量回归网络输入。</span>
+
+<span class="sd">    投影方式：</span>
+<span class="sd">        - 使用 (x, z) 平面构建 BEV</span>
+<span class="sd">        - 统计每个栅格中的点数作为强度值</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        local_clusters: List[(Ni, 3)]</span>
+<span class="sd">            以质心为原点的局部点云集合。</span>
+
+<span class="sd">        bev_height: int</span>
+<span class="sd">            BEV 栅格高度。</span>
+
+<span class="sd">        bev_width: int</span>
+<span class="sd">            BEV 栅格宽度。</span>
+
+<span class="sd">        x_range: float</span>
+<span class="sd">            BEV 在 x 方向的最大覆盖范围（[-x_range, x_range]）。</span>
+
+<span class="sd">        z_range: float</span>
+<span class="sd">            BEV 在 z 方向的最大覆盖范围（[-z_range, z_range]）。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bev_maps: (K, 1, H, W)</span>
+<span class="sd">            每个实例对应的 BEV 投影结果，</span>
+<span class="sd">            单通道表示点数密度。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">clusters</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clusters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">bev_maps</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bev_height</span><span class="p">,</span> <span class="n">bev_width</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">clusters</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">pts</span> <span class="o">=</span> <span class="n">clusters</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">x_norm</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">x_range</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">x_range</span><span class="p">)</span>
+        <span class="n">z_norm</span> <span class="o">=</span> <span class="p">(</span><span class="n">z</span> <span class="o">+</span> <span class="n">z_range</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">z_range</span><span class="p">)</span>
+
+        <span class="n">x_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">((</span><span class="n">x_norm</span> <span class="o">*</span> <span class="n">bev_width</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bev_width</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">z_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">((</span><span class="n">z_norm</span> <span class="o">*</span> <span class="n">bev_height</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bev_height</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># 用 index_put_ 累加（比 Python for 快很多）</span>
+        <span class="n">bev</span> <span class="o">=</span> <span class="n">bev_maps</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">bev</span><span class="o">.</span><span class="n">index_put_</span><span class="p">((</span><span class="n">z_idx</span><span class="p">,</span> <span class="n">x_idx</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">x_idx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">bev</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span> <span class="n">accumulate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">bev_maps</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><hr />
+<h3 id="farawayfrustumboxregression">FarawayFrustumBoxRegression<a class="headerlink" href="#farawayfrustumboxregression" title="Permanent link">&para;</a></h3>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="Faraway_Refinement.network.FarawayFrustumBoxRegression"></a>
+    <div class="doc doc-contents first">
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="Faraway_Refinement.network.FarawayFrustumBoxRegression.FarawayFrustumBoxRegression" class="doc doc-heading">
+            <code>FarawayFrustumBoxRegression</code>
+
+
+<a href="#Faraway_Refinement.network.FarawayFrustumBoxRegression.FarawayFrustumBoxRegression" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="torch.nn.Module">Module</span></code></p>
+
+
+        <p>FarawayFrustumBoxRegression 模块（Faraway-Frustum 远距离回归阶段核心算子）。</p>
+<p>该模块对每个远距离目标的 BEV 投影特征进行非线性映射，
+用于在稀疏点云条件下回归 3D 边界框参数。
+其本质是一个轻量级卷积网络，通过多层卷积与全连接层，
+学习 BEV 空间中目标的深度修正量、尺寸以及朝向。</p>
+<p>本模块属于 <strong>可学习算子</strong>，其参数在训练过程中根据监督信号更新。</p>
+<hr />
+<h5 id="Faraway_Refinement.network.FarawayFrustumBoxRegression.FarawayFrustumBoxRegression--_1">结构说明（按顺序）<a class="headerlink" href="#Faraway_Refinement.network.FarawayFrustumBoxRegression.FarawayFrustumBoxRegression--_1" title="Permanent link">&para;</a></h5>
+<ol>
+<li><strong>Conv2d 1 → 16, kernel=3, padding=1</strong></li>
+<li>
+<p>对 BEV 单通道输入进行初步空间特征提取。</p>
+</li>
+<li>
+<p><strong>ReLU 激活</strong></p>
+</li>
+<li>
+<p><strong>Conv2d 16 → 32, kernel=3, padding=1</strong></p>
+</li>
+<li>
+<p>增强空间语义表达能力。</p>
+</li>
+<li>
+<p><strong>ReLU 激活</strong></p>
+</li>
+<li>
+<p><strong>AdaptiveAvgPool2d → (1, 1)</strong></p>
+</li>
+<li>
+<p>将空间特征压缩为全局特征向量。</p>
+</li>
+<li>
+<p><strong>Flatten</strong></p>
+</li>
+<li>
+<p>展平为一维向量。</p>
+</li>
+<li>
+<p><strong>Linear 32 → 64</strong></p>
+</li>
+<li>
+<p>非线性映射，提高回归表达能力。</p>
+</li>
+<li>
+<p><strong>ReLU 激活</strong></p>
+</li>
+<li>
+<p><strong>Linear 64 → 5</strong></p>
+</li>
+<li>输出回归参数：
+     (Δz, w, l, h, α)</li>
+</ol>
+<hr />
+<h5 id="Faraway_Refinement.network.FarawayFrustumBoxRegression.FarawayFrustumBoxRegression--_2">输入<a class="headerlink" href="#Faraway_Refinement.network.FarawayFrustumBoxRegression.FarawayFrustumBoxRegression--_2" title="Permanent link">&para;</a></h5>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>bev_features</code></b>
+                  (<code><span title="torch.Tensor">Tensor</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>BEV 投影特征张量，shape 为 <strong>(B, 1, H, W)</strong>
+- B：batch size
+- 1：单通道 BEV 密度图
+- H, W：BEV 空间分辨率</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>        <hr />
+<h5 id="Faraway_Refinement.network.FarawayFrustumBoxRegression.FarawayFrustumBoxRegression--_1">输出<a class="headerlink" href="#Faraway_Refinement.network.FarawayFrustumBoxRegression.FarawayFrustumBoxRegression--_1" title="Permanent link">&para;</a></h5>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              –
+              <div class="doc-md-description">
+                <p>torch.Tensor:
+回归结果张量，shape：<strong>(B, 5)</strong>
+- Δz：深度修正量
+- w：目标宽度
+- l：目标长度
+- h：目标高度
+- α：朝向角</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>        <hr />
+<h5 id="Faraway_Refinement.network.FarawayFrustumBoxRegression.FarawayFrustumBoxRegression--_1">模块用途<a class="headerlink" href="#Faraway_Refinement.network.FarawayFrustumBoxRegression.FarawayFrustumBoxRegression--_1" title="Permanent link">&para;</a></h5>
+<ul>
+<li>针对远距离目标进行轻量级 3D 边界框回归</li>
+<li>在点云稀疏条件下避免复杂点云特征学习</li>
+<li>属于 Faraway-Frustum 的 Stage3：Faraway Box Refinement 核心部分</li>
+</ul>
+
+              <details class="quote">
+                <summary>Source code in <code>Faraway_Refinement\network\FarawayFrustumBoxRegression.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">  5</span>
+<span class="normal">  6</span>
+<span class="normal">  7</span>
+<span class="normal">  8</span>
+<span class="normal">  9</span>
+<span class="normal"> 10</span>
+<span class="normal"> 11</span>
+<span class="normal"> 12</span>
+<span class="normal"> 13</span>
+<span class="normal"> 14</span>
+<span class="normal"> 15</span>
+<span class="normal"> 16</span>
+<span class="normal"> 17</span>
+<span class="normal"> 18</span>
+<span class="normal"> 19</span>
+<span class="normal"> 20</span>
+<span class="normal"> 21</span>
+<span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
+<span class="normal"> 26</span>
+<span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">FarawayFrustumBoxRegression</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    FarawayFrustumBoxRegression 模块（Faraway-Frustum 远距离回归阶段核心算子）。</span>
+
+<span class="sd">    该模块对每个远距离目标的 BEV 投影特征进行非线性映射，</span>
+<span class="sd">    用于在稀疏点云条件下回归 3D 边界框参数。</span>
+<span class="sd">    其本质是一个轻量级卷积网络，通过多层卷积与全连接层，</span>
+<span class="sd">    学习 BEV 空间中目标的深度修正量、尺寸以及朝向。</span>
+
+<span class="sd">    本模块属于 **可学习算子**，其参数在训练过程中根据监督信号更新。</span>
+
+<span class="sd">    ---</span>
+<span class="sd">    ### 结构说明（按顺序）</span>
+
+<span class="sd">    1. **Conv2d 1 → 16, kernel=3, padding=1**</span>
+<span class="sd">       - 对 BEV 单通道输入进行初步空间特征提取。</span>
+
+<span class="sd">    2. **ReLU 激活**</span>
+
+<span class="sd">    3. **Conv2d 16 → 32, kernel=3, padding=1**</span>
+<span class="sd">       - 增强空间语义表达能力。</span>
+
+<span class="sd">    4. **ReLU 激活**</span>
+
+<span class="sd">    5. **AdaptiveAvgPool2d → (1, 1)**</span>
+<span class="sd">       - 将空间特征压缩为全局特征向量。</span>
+
+<span class="sd">    6. **Flatten**</span>
+<span class="sd">       - 展平为一维向量。</span>
+
+<span class="sd">    7. **Linear 32 → 64**</span>
+<span class="sd">       - 非线性映射，提高回归表达能力。</span>
+
+<span class="sd">    8. **ReLU 激活**</span>
+
+<span class="sd">    9. **Linear 64 → 5**</span>
+<span class="sd">       - 输出回归参数：</span>
+<span class="sd">         (Δz, w, l, h, α)</span>
+
+<span class="sd">    ---</span>
+<span class="sd">    ### 输入</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        bev_features (torch.Tensor):</span>
+<span class="sd">            BEV 投影特征张量，shape 为 **(B, 1, H, W)**</span>
+<span class="sd">            - B：batch size</span>
+<span class="sd">            - 1：单通道 BEV 密度图</span>
+<span class="sd">            - H, W：BEV 空间分辨率</span>
+
+<span class="sd">    ---</span>
+<span class="sd">    ### 输出</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor:</span>
+<span class="sd">            回归结果张量，shape：**(B, 5)**</span>
+<span class="sd">            - Δz：深度修正量</span>
+<span class="sd">            - w：目标宽度</span>
+<span class="sd">            - l：目标长度</span>
+<span class="sd">            - h：目标高度</span>
+<span class="sd">            - α：朝向角</span>
+
+<span class="sd">    ---</span>
+<span class="sd">    ### 模块用途</span>
+
+<span class="sd">    - 针对远距离目标进行轻量级 3D 边界框回归</span>
+<span class="sd">    - 在点云稀疏条件下避免复杂点云特征学习</span>
+<span class="sd">    - 属于 Faraway-Frustum 的 Stage3：Faraway Box Refinement 核心部分</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FarawayFrustumBoxRegression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relu1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relu2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">AdaptiveAvgPool2d</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relu3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bev_features</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">bev_features</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu3</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div><hr />
+<h3 id="assemble_faraway_3d_box">assemble_faraway_3d_box<a class="headerlink" href="#assemble_faraway_3d_box" title="Permanent link">&para;</a></h3>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="Faraway_Refinement.operator.assemble_faraway_3d_box"></a>
+    <div class="doc doc-contents first">
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="Faraway_Refinement.operator.assemble_faraway_3d_box.assemble_faraway_3d_box" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">assemble_faraway_3d_box</span><span class="p">(</span><span class="n">centroids</span><span class="p">,</span> <span class="n">regression_outputs</span><span class="p">)</span></code>
+
+<a href="#Faraway_Refinement.operator.assemble_faraway_3d_box.assemble_faraway_3d_box" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>远距离 3D 边界框组装算子。</p>
+<p>该算子将几何阶段估计得到的质心平面位置 (x, y)
+与 FarawayFrustumBoxRegression 网络输出的回归结果进行融合，
+生成最终的 3D 边界框参数。</p>
+<p>该算子不包含可学习参数，仅负责数据拼接与结构组装，
+属于 Faraway-Frustum 的结果生成阶段。</p>
+<hr />
+<h5 id="Faraway_Refinement.operator.assemble_faraway_3d_box.assemble_faraway_3d_box--_1">输入<a class="headerlink" href="#Faraway_Refinement.operator.assemble_faraway_3d_box.assemble_faraway_3d_box--_1" title="Permanent link">&para;</a></h5>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>centroids</code></b>
+                  (<code><span title="torch.Tensor">Tensor</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>每个实例的三维质心坐标，shape 为 <strong>(B, 3)</strong>
+- B：实例数量
+- 3：(x, y, z)</p>
+              </div>
+            </li>
+            <li>
+              <b><code>regression_outputs</code></b>
+                  (<code><span title="torch.Tensor">Tensor</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>网络回归输出，shape 为 <strong>(B, 5)</strong>
+- Δz：深度修正量
+- w：宽度
+- l：长度
+- h：高度
+- α：朝向角</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>        <hr />
+<h5 id="Faraway_Refinement.operator.assemble_faraway_3d_box.assemble_faraway_3d_box--_1">输出<a class="headerlink" href="#Faraway_Refinement.operator.assemble_faraway_3d_box.assemble_faraway_3d_box--_1" title="Permanent link">&para;</a></h5>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="torch.Tensor">Tensor</span></code>
+              –
+              <div class="doc-md-description">
+                <p>torch.Tensor:
+最终 3D 边界框，shape：<strong>(B, 7)</strong>
+格式为：
+(x, y, z_refined, w, l, h, α)</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>        <hr />
+<h5 id="Faraway_Refinement.operator.assemble_faraway_3d_box.assemble_faraway_3d_box--_1">算子用途<a class="headerlink" href="#Faraway_Refinement.operator.assemble_faraway_3d_box.assemble_faraway_3d_box--_1" title="Permanent link">&para;</a></h5>
+<ul>
+<li>将几何定位结果与学习回归结果融合</li>
+<li>输出标准格式的 3D 边界框</li>
+<li>属于 Faraway-Frustum 的 Stage3：Box Assembly 阶段</li>
+</ul>
+
+            <details class="quote">
+              <summary>Source code in <code>Faraway_Refinement\operator\assemble_faraway_3d_box.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@torch</span><span class="o">.</span><span class="n">library</span><span class="o">.</span><span class="n">custom_op</span><span class="p">(</span><span class="s2">&quot;faraway::assemble_faraway_3d_box&quot;</span><span class="p">,</span> <span class="n">mutates_args</span><span class="o">=</span><span class="p">[])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">assemble_faraway_3d_box</span><span class="p">(</span>
+    <span class="n">centroids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">regression_outputs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    远距离 3D 边界框组装算子。</span>
+
+<span class="sd">    该算子将几何阶段估计得到的质心平面位置 (x, y)</span>
+<span class="sd">    与 FarawayFrustumBoxRegression 网络输出的回归结果进行融合，</span>
+<span class="sd">    生成最终的 3D 边界框参数。</span>
+
+<span class="sd">    该算子不包含可学习参数，仅负责数据拼接与结构组装，</span>
+<span class="sd">    属于 Faraway-Frustum 的结果生成阶段。</span>
+
+<span class="sd">    ---</span>
+<span class="sd">    ### 输入</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        centroids (torch.Tensor):</span>
+<span class="sd">            每个实例的三维质心坐标，shape 为 **(B, 3)**</span>
+<span class="sd">            - B：实例数量</span>
+<span class="sd">            - 3：(x, y, z)</span>
+
+<span class="sd">        regression_outputs (torch.Tensor):</span>
+<span class="sd">            网络回归输出，shape 为 **(B, 5)**</span>
+<span class="sd">            - Δz：深度修正量</span>
+<span class="sd">            - w：宽度</span>
+<span class="sd">            - l：长度</span>
+<span class="sd">            - h：高度</span>
+<span class="sd">            - α：朝向角</span>
+
+<span class="sd">    ---</span>
+<span class="sd">    ### 输出</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor:</span>
+<span class="sd">            最终 3D 边界框，shape：**(B, 7)**</span>
+<span class="sd">            格式为：</span>
+<span class="sd">            (x, y, z_refined, w, l, h, α)</span>
+
+<span class="sd">    ---</span>
+<span class="sd">    ### 算子用途</span>
+
+<span class="sd">    - 将几何定位结果与学习回归结果融合</span>
+<span class="sd">    - 输出标准格式的 3D 边界框</span>
+<span class="sd">    - 属于 Faraway-Frustum 的 Stage3：Box Assembly 阶段</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">centroids</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">centroids</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">centroids</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">delta_z</span> <span class="o">=</span> <span class="n">regression_outputs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">regression_outputs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">regression_outputs</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">regression_outputs</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">regression_outputs</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span>
+
+    <span class="n">z_refined</span> <span class="o">=</span> <span class="n">z</span> <span class="o">+</span> <span class="n">delta_z</span>
+
+    <span class="n">boxes_3d</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z_refined</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">alpha</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">boxes_3d</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../Frustum_Construction/" class="btn btn-neutral float-left" title="Frustum 构建阶段 (Frustum Construction)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../framework/" class="btn btn-neutral float-right" title="Faraway-Frustum 框架结构">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../Frustum_Construction/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../framework/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

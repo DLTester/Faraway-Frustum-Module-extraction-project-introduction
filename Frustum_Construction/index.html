@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Frustum 构建阶段 (Frustum Construction) - Faraway-Frustum 融合算子文档</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../css/overrides.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Frustum \u6784\u5efa\u9636\u6bb5 (Frustum Construction)";
+        var mkdocs_page_input_path = "Frustum_Construction.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Faraway-Frustum 融合算子文档
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">文档首页</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Frustum 构建阶段 (Frustum Construction)</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#api">API 文档</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#mask_frustum_pointcloud_crop">mask_frustum_pointcloud_crop</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Frustum_Construction.operator.mask_frustum_pointcloud_crop">mask_frustum_pointcloud_crop</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Frustum_Construction.operator.mask_frustum_pointcloud_crop.mask_frustum_pointcloud_crop">mask_frustum_pointcloud_crop</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#frustum_histogram_clustering">frustum_histogram_clustering</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Frustum_Construction.operator.frustum_histogram_clustering">frustum_histogram_clustering</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Frustum_Construction.operator.frustum_histogram_clustering.frustum_histogram_clustering">frustum_histogram_clustering</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#faraway_object_decision">faraway_object_decision</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Frustum_Construction.operator.faraway_object_decision">faraway_object_decision</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#Frustum_Construction.operator.faraway_object_decision.faraway_object_decision">faraway_object_decision</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Faraway_Refinement/">Faraway 细化阶段 (Faraway Refinement)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../framework/">Faraway-Frustum 框架结构</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Faraway-Frustum 融合算子文档</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Frustum 构建阶段 (Frustum Construction)</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="stage-1-frustum-constructionfrustum">Stage 1 – Frustum Construction（Frustum 构建阶段）<a class="headerlink" href="#stage-1-frustum-constructionfrustum" title="Permanent link">&para;</a></h1>
+<p>💡<br />
+本阶段的作用是 <strong>根据 2D 实例信息构建对应的 Frustum 点云，并估计目标质心与远近类别</strong>，
+为后续 Faraway 细化阶段提供几何基础。</p>
+<p>本阶段包含三个算子：</p>
+<ol>
+<li>
+<p><strong>mask_frustum_pointcloud_crop</strong><br />
+   根据 2D mask / box 裁剪点云，生成对应的 Frustum 点云簇。</p>
+</li>
+<li>
+<p><strong>frustum_histogram_clustering</strong><br />
+   对每个 Frustum 点云进行直方图统计，估计目标质心。</p>
+</li>
+<li>
+<p><strong>faraway_object_decision</strong><br />
+   根据深度阈值判断目标属于 faraway 还是 near。</p>
+</li>
+</ol>
+<hr />
+<h2 id="api">API 文档<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
+<h3 id="mask_frustum_pointcloud_crop">mask_frustum_pointcloud_crop<a class="headerlink" href="#mask_frustum_pointcloud_crop" title="Permanent link">&para;</a></h3>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="Frustum_Construction.operator.mask_frustum_pointcloud_crop"></a>
+    <div class="doc doc-contents first">
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="Frustum_Construction.operator.mask_frustum_pointcloud_crop.mask_frustum_pointcloud_crop" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">mask_frustum_pointcloud_crop</span><span class="p">(</span><span class="n">points_2d_img</span><span class="p">,</span> <span class="n">points_3d_cam0</span><span class="p">,</span> <span class="n">boxes_2d</span><span class="p">,</span> <span class="n">masks_2d</span><span class="p">,</span> <span class="n">max_points</span><span class="o">=</span><span class="mi">2048</span><span class="p">)</span></code>
+
+<a href="#Frustum_Construction.operator.mask_frustum_pointcloud_crop.mask_frustum_pointcloud_crop" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>根据 2D 检测结果生成对应的 Frustum 点云子集。</p>
+<p>该算子将 LiDAR 点投影到图像平面后，
+根据 2D 边界框或 2D 分割掩码筛选属于每个实例的 3D 点，
+最终输出每个实例对应的 Frustum 点云。</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>points_2d_img</code></b>
+                  (<code><span title="torch.Tensor">Tensor</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>(N, 2)
+投影到图像平面的 2D 点坐标。</p>
+              </div>
+            </li>
+            <li>
+              <b><code>points_3d_cam0</code></b>
+                  (<code><span title="torch.Tensor">Tensor</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>(N, 3)
+对应的 3D 点（相机坐标系）。</p>
+              </div>
+            </li>
+            <li>
+              <b><code>boxes_2d</code></b>
+                  (<code><span title="torch.Tensor">Tensor</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>(K, 4)
+2D 检测边界框，格式 [x1, y1, x2, y2]。</p>
+              </div>
+            </li>
+            <li>
+              <b><code>masks_2d</code></b>
+                  (<code><span title="torch.Tensor">Tensor</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>(K, H, W)
+2D 分割掩码，若为 None 表示仅使用 2D 框。</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+<b><code>frustum_clusters</code></b>(                  <code><span title="typing.Tuple">Tuple</span>[<span title="torch.Tensor">Tensor</span>, <span title="torch.Tensor">Tensor</span>]</code>
+)              –
+              <div class="doc-md-description">
+                <p>(K,)
+每个实例对应的 Frustum 点云（变长集合，按实例划分）。</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+            <details class="quote">
+              <summary>Source code in <code>Frustum_Construction\operator\mask_frustum_pointcloud_crop.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@torch</span><span class="o">.</span><span class="n">library</span><span class="o">.</span><span class="n">custom_op</span><span class="p">(</span><span class="s2">&quot;faraway::mask_frustum_pointcloud_crop&quot;</span><span class="p">,</span> <span class="n">mutates_args</span><span class="o">=</span><span class="p">[])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mask_frustum_pointcloud_crop</span><span class="p">(</span>
+    <span class="n">points_2d_img</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>     <span class="c1"># (N, 2)</span>
+    <span class="n">points_3d_cam0</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>    <span class="c1"># (N, 3)</span>
+    <span class="n">boxes_2d</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>          <span class="c1"># (K, 4)</span>
+    <span class="n">masks_2d</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>          <span class="c1"># (K, H, W)  (可传空 Tensor: shape=(0,))</span>
+    <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2048</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    根据 2D 检测结果生成对应的 Frustum 点云子集。</span>
+
+<span class="sd">    该算子将 LiDAR 点投影到图像平面后，</span>
+<span class="sd">    根据 2D 边界框或 2D 分割掩码筛选属于每个实例的 3D 点，</span>
+<span class="sd">    最终输出每个实例对应的 Frustum 点云。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        points_2d_img: (N, 2)</span>
+<span class="sd">            投影到图像平面的 2D 点坐标。</span>
+
+<span class="sd">        points_3d_cam0: (N, 3)</span>
+<span class="sd">            对应的 3D 点（相机坐标系）。</span>
+
+<span class="sd">        boxes_2d: (K, 4)</span>
+<span class="sd">            2D 检测边界框，格式 [x1, y1, x2, y2]。</span>
+
+<span class="sd">        masks_2d: (K, H, W)</span>
+<span class="sd">            2D 分割掩码，若为 None 表示仅使用 2D 框。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        frustum_clusters: (K,)</span>
+<span class="sd">            每个实例对应的 Frustum 点云（变长集合，按实例划分）。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">device</span> <span class="o">=</span> <span class="n">points_3d_cam0</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">boxes_2d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">clusters</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="n">max_points</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">points_3d_cam0</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">K</span><span class="p">,),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+
+    <span class="n">use_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">masks_2d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">masks_2d</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">use_mask</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">masks_2d</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="c1"># (H, W)</span>
+            <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="c1"># 投影点取整到像素坐标</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">points_2d_img</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">points_2d_img</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+
+            <span class="c1"># 图像范围内</span>
+            <span class="n">in_img</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">W</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">y</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">y</span> <span class="o">&lt;</span> <span class="n">H</span><span class="p">)</span>
+
+            <span class="c1"># mask 内</span>
+            <span class="n">x_in</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">in_img</span><span class="p">]</span>
+            <span class="n">y_in</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">in_img</span><span class="p">]</span>
+            <span class="n">inside</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">in_img</span><span class="p">)</span>
+            <span class="n">inside</span><span class="p">[</span><span class="n">in_img</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="n">y_in</span><span class="p">,</span> <span class="n">x_in</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">inside</span><span class="p">,</span> <span class="n">as_tuple</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">boxes_2d</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">points_2d_img</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">points_2d_img</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">inside</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="n">x1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="n">x2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">y</span> <span class="o">&gt;=</span> <span class="n">y1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="n">y2</span><span class="p">)</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">inside</span><span class="p">,</span> <span class="n">as_tuple</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">idx</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">continue</span>
+
+        <span class="n">pts</span> <span class="o">=</span> <span class="n">points_3d_cam0</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># (Ni,3)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_points</span><span class="p">))</span>
+        <span class="n">clusters</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[:</span><span class="n">n</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
+
+    <span class="k">return</span> <span class="n">clusters</span><span class="p">,</span> <span class="n">counts</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><hr />
+<h3 id="frustum_histogram_clustering">frustum_histogram_clustering<a class="headerlink" href="#frustum_histogram_clustering" title="Permanent link">&para;</a></h3>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="Frustum_Construction.operator.frustum_histogram_clustering"></a>
+    <div class="doc doc-contents first">
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="Frustum_Construction.operator.frustum_histogram_clustering.frustum_histogram_clustering" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">frustum_histogram_clustering</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span></code>
+
+<a href="#Frustum_Construction.operator.frustum_histogram_clustering.frustum_histogram_clustering" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>对每个 Frustum 点云执行直方图聚类，估计目标三维质心位置。</p>
+<p>该算子对每个实例对应的 Frustum 点云分别在 x / y / z 三个轴上
+进行一维直方图统计，选取点数最多的 bin 区间中心作为该轴估计值，
+最终得到每个目标的三维质心坐标。</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>frustum_clusters</code></b>
+              –
+              <div class="doc-md-description">
+                <p>List[(Ni, 3)]
+每个实例对应的 Frustum 点云集合，
+Ni 为该实例内的点数。</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+<b><code>centroids</code></b>(                  <code><span title="torch.Tensor">Tensor</span></code>
+)              –
+              <div class="doc-md-description">
+                <p>(K, 3)
+每个实例估计得到的质心坐标 (x, y, z)。
+若某实例点云为空，则对应位置为 (0, 0, 0)。</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+            <details class="quote">
+              <summary>Source code in <code>Frustum_Construction\operator\frustum_histogram_clustering.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@torch</span><span class="o">.</span><span class="n">library</span><span class="o">.</span><span class="n">custom_op</span><span class="p">(</span><span class="s2">&quot;faraway::frustum_histogram_clustering&quot;</span><span class="p">,</span> <span class="n">mutates_args</span><span class="o">=</span><span class="p">[])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">frustum_histogram_clustering</span><span class="p">(</span>
+    <span class="n">clusters</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>   <span class="c1"># (K, P, 3)</span>
+    <span class="n">counts</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>     <span class="c1"># (K,)</span>
+    <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    对每个 Frustum 点云执行直方图聚类，估计目标三维质心位置。</span>
+
+<span class="sd">    该算子对每个实例对应的 Frustum 点云分别在 x / y / z 三个轴上</span>
+<span class="sd">    进行一维直方图统计，选取点数最多的 bin 区间中心作为该轴估计值，</span>
+<span class="sd">    最终得到每个目标的三维质心坐标。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        frustum_clusters: List[(Ni, 3)]</span>
+<span class="sd">            每个实例对应的 Frustum 点云集合，</span>
+<span class="sd">            Ni 为该实例内的点数。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        centroids: (K, 3)</span>
+<span class="sd">            每个实例估计得到的质心坐标 (x, y, z)。</span>
+<span class="sd">            若某实例点云为空，则对应位置为 (0, 0, 0)。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">clusters</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clusters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">centroids</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">clusters</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">pts</span> <span class="o">=</span> <span class="n">clusters</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="p">:]</span>  <span class="c1"># (n,3)</span>
+
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[:,</span> <span class="n">d</span><span class="p">]</span>
+            <span class="n">vmin</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">vmax</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">vmax</span> <span class="o">-</span> <span class="n">vmin</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">:</span>
+                <span class="n">centroids</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">vmin</span>
+                <span class="k">continue</span>
+
+            <span class="n">hist</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">histc</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">vmin</span><span class="p">),</span> <span class="nb">max</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">vmax</span><span class="p">))</span>
+            <span class="n">max_bin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">hist</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+            <span class="n">bin_w</span> <span class="o">=</span> <span class="p">(</span><span class="n">vmax</span> <span class="o">-</span> <span class="n">vmin</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span>
+            <span class="n">center</span> <span class="o">=</span> <span class="n">vmin</span> <span class="o">+</span> <span class="p">(</span><span class="n">max_bin</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">bin_w</span>
+            <span class="n">centroids</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span>
+
+    <span class="k">return</span> <span class="n">centroids</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><hr />
+<h3 id="faraway_object_decision">faraway_object_decision<a class="headerlink" href="#faraway_object_decision" title="Permanent link">&para;</a></h3>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="Frustum_Construction.operator.faraway_object_decision"></a>
+    <div class="doc doc-contents first">
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="Frustum_Construction.operator.faraway_object_decision.faraway_object_decision" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">faraway_object_decision</span><span class="p">(</span><span class="n">centroids</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">depth_thresholds</span><span class="p">)</span></code>
+
+<a href="#Frustum_Construction.operator.faraway_object_decision.faraway_object_decision" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>远距离目标判定算子。</p>
+<p>根据每个实例的质心深度 z 值以及类别对应的距离阈值，
+判断该实例是否属于远距离目标，从而决定后续走
+Faraway 分支还是 SOTA 检测分支。</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>centroids</code></b>
+                  (<code><span title="torch.Tensor">Tensor</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>(K, 3)
+每个实例的三维质心坐标 (x, y, z)。</p>
+              </div>
+            </li>
+            <li>
+              <b><code>labels</code></b>
+                  (<code><span title="torch.Tensor">Tensor</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>(K,)
+每个实例的类别 ID。</p>
+              </div>
+            </li>
+            <li>
+              <b><code>depth_thresholds</code></b>
+                  (<code><span title="torch.Tensor">Tensor</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>(C,)
+每个类别对应的远距离深度阈值，
+C 为类别总数，索引与 labels 对应。</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+<b><code>is_faraway</code></b>(                  <code><span title="torch.Tensor">Tensor</span></code>
+)              –
+              <div class="doc-md-description">
+                <p>(K,)
+布尔张量，True 表示该实例为远距离目标，
+False 表示为近距离目标。</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+            <details class="quote">
+              <summary>Source code in <code>Frustum_Construction\operator\faraway_object_decision.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@torch</span><span class="o">.</span><span class="n">library</span><span class="o">.</span><span class="n">custom_op</span><span class="p">(</span><span class="s2">&quot;faraway::faraway_object_decision&quot;</span><span class="p">,</span> <span class="n">mutates_args</span><span class="o">=</span><span class="p">[])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">faraway_object_decision</span><span class="p">(</span>
+    <span class="n">centroids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">labels</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">depth_thresholds</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    远距离目标判定算子。</span>
+
+<span class="sd">    根据每个实例的质心深度 z 值以及类别对应的距离阈值，</span>
+<span class="sd">    判断该实例是否属于远距离目标，从而决定后续走</span>
+<span class="sd">    Faraway 分支还是 SOTA 检测分支。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        centroids: (K, 3)</span>
+<span class="sd">            每个实例的三维质心坐标 (x, y, z)。</span>
+
+<span class="sd">        labels: (K,)</span>
+<span class="sd">            每个实例的类别 ID。</span>
+
+<span class="sd">        depth_thresholds: (C,)</span>
+<span class="sd">            每个类别对应的远距离深度阈值，</span>
+<span class="sd">            C 为类别总数，索引与 labels 对应。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        is_faraway: (K,)</span>
+<span class="sd">            布尔张量，True 表示该实例为远距离目标，</span>
+<span class="sd">            False 表示为近距离目标。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">z_values</span> <span class="o">=</span> <span class="n">centroids</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># 根据类别索引取对应阈值</span>
+    <span class="n">class_thresholds</span> <span class="o">=</span> <span class="n">depth_thresholds</span><span class="p">[</span><span class="n">labels</span><span class="p">]</span>
+
+    <span class="n">is_faraway</span> <span class="o">=</span> <span class="n">z_values</span> <span class="o">&gt;</span> <span class="n">class_thresholds</span>
+
+    <span class="k">return</span> <span class="n">is_faraway</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="文档首页"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../Faraway_Refinement/" class="btn btn-neutral float-right" title="Faraway 细化阶段 (Faraway Refinement)">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../Faraway_Refinement/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
